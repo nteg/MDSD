@@ -1,10 +1,5 @@
-//Open points:
-//-	Make the whole language consistent – named parameters
-//-	Calling vs definition {} vs ()
-//-	Validators (maybe closure type definition)
 //Thinking about:
 //-	Integration of services : GPS, SMS,… (OSGI in IoT)
-
 datatype String mappedto java.lang.String config init "null" persistable
 datatype GenderEnum mappedto com.nagarrro.app.domain.GenderEnum config init "0" persistable
 
@@ -52,40 +47,17 @@ namespace com.nagarrro.app.business
     }
 }
 
-
-namespace com.nagarrro.app.ui
-{	
-	
-	interface PersonController
-	{
-		operation @rest{"/persons", Method.GET} listPersons(): Person[]
-		operation @rest{"/person/{id}", Method.GET} getPerson(long id): Person
-		operation @rest{"/person/add", Method.POST} addPerson(Person person): Person
-		operation @rest{"/person/update", Method.PUT} updatePerson(Person updatePerson): Person
-	}
-	
-	stateless-component PersonControllerProvider
-	{
-		requires personRepository : PersonRepository
-		provides personController : PersonController
-	}
-	
-	interface PersonRepository
-    {
-        operation store(Person person)  : void
-        operation findAll() : Person[]
-        operation findById(long id) : Person
-    }
-    
-    domain-repository for Person PersonRepositoryProvider
-    {
-       provides personRepository : PersonRepository
-    }
-}
-
-
 namespace com.nagarrro.app.ui
 {
+	interface Email
+	{
+		 operation sendEmail(String text, String to)  : void
+	}
+	
+	stateless-component EmailService
+	{
+		 provides email : Email
+	}
 }
 
 system mobileApp
@@ -103,6 +75,7 @@ system mobileApp
 	{
 	  	main(appName : "",appVersion : "", devices : [iphone, ipad, android4, android2] ,	entry  : PersonListScreen,	generalStyle: "maybe a file with css")
 
+		instance emailService : EmailService
 
 		screen allscreenshere
 		{
@@ -140,30 +113,31 @@ system mobileApp
 				   // standard for all screens: databinding + ui
 				   initaction
 				   {
-	    			   	 persons setto restcall(url: "/persons", returnType:List)
+	    			   	 set persons to restcall(url: "/persons", returnType:List)
 	    			   	
-					     persons bindto personListId.values
-					     person bindto personListId.selection
+					     bind persons to personListId.values
+					     bind person to personListId.selection
 
-					     addPersonSelection listenon personListAdd.onSelection
+					     attach addPersonSelection to personListAdd.onSelection
 				   }
 			   
 			         uiaction listEntrySelection
 			         {
-			         	person setto personListId.selection
+			         	set person to personListId.selection
 			            execute goToPersonDetail
 			         }
 			         
 			         uiaction addPersonSelection
 			         {
-			            model.person setto Person()
+			            set model.person to Person
 			            execute goToPersonDetail
 			         }
 			         
 			         uiaction goToPersonDetail
 			         {
+			         	emailService.sendEmail(text:"Bla", to:"me")
 			         	smsService.sendSms(message:"fafd")
-			         	p.age setto gpsService.getCurrentLocation
+			         	set p.age to gpsService.getCurrentLocation()
 			            navigateto PersonDetailScreen(personId : person.id, aParam: "asdfasfasfasdf")
 			         }
 		      }
@@ -213,19 +187,19 @@ system mobileApp
 			   {
 			   
 			     //databindings
-			      person.name bindto textPersonNameId.text
-				  person.age bindto textPersonAgeId.text
-			      enumDataSource(enumClassName:"com.nagarrro.app.domain.GenderEnum") bindto comboPersonGenderId.values
+			      bind person.name to textPersonNameId.text
+				  bind person.age to textPersonAgeId.text
+			      bind enumDataSource(enumClassName:"com.nagarrro.app.domain.GenderEnum") to comboPersonGenderId.values
 			       
 			      // ui listeners
-			      updateButtonSelection listento PersonListScreen.updateButtonId.onSelection
-			      goToPersonList listento PersonListScreen.backButtonId.onSelection
+			      attach updateButtonSelection to PersonListScreen.updateButtonId.onSelection
+			      attach goToPersonList to PersonListScreen.backButtonId.onSelection
 			      
 			      //validation
-			      one validateon textPersonNameId.text
-			      two validateon textPersonAgeId.text
+			      validate one on textPersonNameId.text
+			      validate two on textPersonAgeId.text
 	 				
-			      person setto restcall(url:"/person/{id}", returnType:Person, id:param1)
+			      set person to restcall(url:"/person/{id}", returnType:Person, id:param1)
 			    }
 
 				validator
@@ -243,7 +217,7 @@ system mobileApp
 		         
 		         uiaction updateButtonSelection
 		         {
-		            person setto restcall(url:"/person/save", returnType:Person, updatePerson : person) 
+		            set person to restcall(url:"/person/save", returnType:Person, updatePerson : person) 
 		            execute navigateToPersonList
 		         }
       }
