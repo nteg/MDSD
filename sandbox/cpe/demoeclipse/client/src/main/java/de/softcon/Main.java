@@ -1,27 +1,37 @@
 package de.softcon;
 
-import net.java.html.boot.BrowserBuilder;
 
-public final class Main {
-    private Main() {
+import net.java.html.boot.BrowserBuilder;
+import de.softcon.business.PageType;
+import de.softcon.business.PersonModel;
+
+public final class Main
+{
+    private Main()
+    {
+
     }
-    
-    public static void main(String... args) throws Exception {
-        BrowserBuilder.newBrowser().
-            loadPage("pages/index.html").
-            loadClass(Main.class).
-            invoke("onPageLoad", args).
-            showAndWait();
+
+    public static void main(String... args) throws Exception
+    {
+        BrowserBuilder.newBrowser().loadPage("pages/index.html").loadClass(Main.class).invoke("onPageLoad", args).showAndWait();
         System.exit(0);
     }
 
-    /**
-     * Called when the page is ready.
-     */
-    public static void onPageLoad() throws Exception {
-        Data d = new Data();
-        d.setMessage("Hello World from HTML and Java!");
-        d.applyBindings();
+    public static void onPageLoad() throws Exception
+    {
+        MainPageData mainPageData = new MainPageData();
+        mainPageData.getPersons().addAll(PersonModel.getInstance().getPersonsInput());
+        mainPageData.setSelectedPerson(PersonModel.getInstance().getPersonsInput().get(0));
+        mainPageData.setCurrentPage(PageType.HOME.toString());
+        mainPageData.applyBindings();
     }
-    
+
+    //TODO lose data
+    public static void onSecondPageLoad() throws Exception
+    {
+        SecondPageData secondPageData = new SecondPageData();
+        secondPageData.setPerson(PersonModel.getInstance().getPersonsInput().get(0));
+        secondPageData.applyBindings();
+    }
 }

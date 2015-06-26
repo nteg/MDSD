@@ -1,74 +1,190 @@
-<!DOCTYPE html>
 <html>
-    <head>
-        <title></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-        <style type="text/css">
-            @-webkit-keyframes spin {
-                0% { -webkit-transform: rotate(0deg); }
-                100% { -webkit-transform: rotate(360deg); }
-            }
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
+  <head>
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    
+    <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="jquery-treegrid/css/jquery.treegrid.css">
+        <link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css">
+        <link rel="stylesheet" href="clickable-panel/css/clickable-panel.css">
+        <script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+		
+		<!--Pulling Awesome Font -->
+		<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
-            input {
-                width: 100%;
-            }
-
-            .rotate {
-                -webkit-animation-name: spin;
-                -webkit-animation-duration: 3s;
-                -webkit-animation-iteration-count: infinite;
-                -webkit-animation-direction: alternate;
-                animation-name: spin;
-                animation-duration: 3s;
-                animation-iteration-count: infinite;
-                animation-direction: alternate;
-            }
-
-            #scene {
-                position: relative;
-                top: 60px;
-                text-align: center;
-            }
-            
-            #words span {
-                border: 1px solid #ccc;
-                background: rgba(255,255,155,0.8);
-                text-align: center;
-                font-size: 30px;                
-                -webkit-box-shadow: inset 0 0 40px rgba(0,0,0,0.4);
-                box-shadow: inset 0 0 40px rgba(0,0,0,0.4);
-                position: absolute;
-            }
-
-            #words span:nth-child(1) { left: 45%; top: 0px; }
-            #words span:nth-child(2) { left: 25%; top: 100px; }
-            #words span:nth-child(3) { left: 65%; top: 100px; }
-            #words span:nth-child(4) { left: 10%; top: 200px; }
-            #words span:nth-child(5) { left: 45%; top: 200px; }
-            #words span:nth-child(6) { left: 80%; top: 200px; }
-            
-        </style>
-
-    </head>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript" src="jquery-treegrid/js/jquery.treegrid.js"></script>
+        <script type="text/javascript" src="jquery-treegrid/js/jquery.treegrid.bootstrap3.js"></script>
+        <script type="text/javascript" src="clickable-panel/js/clickable-panel.js"></script>
+  </head>
+  
     <body>
-        <h1>Words Demo</h1>
-        <input data-bind="value: message, valueUpdate: 'afterkeydown'">
-        <br>
-        <button data-bind="enable: !rotating(), click: $root.turnAnimationOn">Start</button>
-        <button data-bind="enable: rotating, click: $root.turnAnimationOff">Stop</button>
-        <button data-bind="enable: !rotating(), click: $root.rotate5s">Rotate Few Seconds</button>
-        <button data-bind="click: $root.showScreenSize">Screen Size!</button>
+    
+    	<!-- Navigation bar -->
+	     <nav class="navbar navbar-inverse">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <a class="navbar-brand" href="#">DukeScript</a>
+		    </div>
+		    <div>
+		      <ul class="nav navbar-nav">
+		        <li class="active"><a href="#" data-bind="click: $root.navigateToHomePage">[Home]</a></li>
+		        <li><a href="#" data-bind="click: $root.navigateToDetailsPage">[Person details]</a></li>
+		        <li><a href="index1.html">[Load new HTML page]</a></li>
+		      </ul>
+		      <ul class="nav navbar-nav navbar-right">
+		        <li><a href="#" data-bind="click: $root.navigateToSignupPage"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+		        <li><a href="#" ><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+		      </ul>
+		    </div>
+		  </div>
+		</nav>
 
-        <div id="scene">
-            <span id="words" data-bind="foreach: words">
-                <span data-bind="text: $data, css: { 'rotate' : $root.rotating } "></span>
-            </span>
+        
+        <!-- Home page -->      
+        <div class="col-md-12" data-bind="visible: ($root.currentPage()==='HOME')">
+        	<div class="col-md-8">
+                <table class="table tree table-hover">
+		            <tbody>
+		            
+		            <!-- ko foreach: persons -->
+		            
+		                <tr data-bind="click: $root.selectPerson, css: treeclass" style="cursor: pointer" class="info">
+		                    <td colspan="3" data-bind="text: personInfo"></th>
+		                </tr>
+		                
+		                <!-- ko foreach: contacts -->
+		                <tr data-bind="click: $root.selectContact, css: treeclass" class="warning"> 
+		                	<td data-bind="text: $data.city"></td>
+		                	<td data-bind="text: $data.street"></td>
+		                	<td data-bind="text: $data.number"></td>  
+		                </tr> 
+		                <!-- /ko -->
+		                
+		            <!-- /ko -->
+		            
+		            </tbody>
+		        </table>
+        	</div>
+        	
+        	<div class="col-md-2">
+		        
+		        <h3> Selected Person </h3>
+		        
+		        <!-- ko with: selectedPerson -->
+		        <form>
+				  <fieldset disabled>
+				    <div class="form-group">
+				      <label for="disabledTextInput">First Name</label>
+				      <input data-bind="textInput: firstName" type="text" id="disabledTextInput" class="form-control">
+				    </div>
+				    
+				    <div class="form-group">
+				      <label for="disabledTextInput2">Last Name</label>
+				      <input data-bind="textInput: lastName" type="text" id="disabledTextInput2" class="form-control">
+				    </div>
+				  </fieldset>
+				  
+				  <fieldset>
+				    <div class="form-group">
+				      <label for="enabledTextInput">Age</label>
+				      <input data-bind="value: age, valueUpdate: 'afterkeydown'" type="text" id="enabledTextInput" class="form-control">
+				    </div>
+				  </fieldset>
+				  
+				  <a href="#" class="btn btn-info" data-bind="click: $root.removePerson">Delete [Selected Person]</a>
+				  
+				  <button class="btn btn-info" onclick="$('.tree').treegrid();" >Style Tree Table</button>
+				  
+				</form>
+				
+				<!-- /ko -->
+			    
+		    </div>
         </div>
+        
+        <!-- Details page -->     
+        <div class="col-md-8" data-bind="visible: ($root.currentPage() === 'DETAILS')">
+        	<div class="col-md-8">
+                
+                <!-- ko with: selectedPerson -->
+                	<h2 data-bind="text: personInfo"></h2>
+                <!-- /ko  -->
+                
+		        <div class="panel panel-primary">
+	                <div class="panel-heading">
+	                    <h3 class="panel-title">Address</h3>
+	                    <span class="pull-right clickable"><i class="glyphicon glyphicon-minus"></i></span>
+	                </div>
+	                <div class="panel-body">
+	                
+		                <table class="table table-hover">
+				            <tbody data-bind="with: $root.selectedPerson">
+				                
+				                <tr class="info"> 
+				                	<th>City</th>
+				                	<th>Street</th>
+				                	<th>Number</th>
+				                </tr> 
+				                
+				                <!-- ko foreach: contacts -->
+				                <tr class="warning"> 
+				                	<td data-bind="text: $data.city"></td>
+				                	<td data-bind="text: $data.street"></td>
+				                	<td data-bind="text: $data.number"></td>  
+				                </tr> 
+				                <!-- /ko -->
+				            
+				            </tbody>
+				        </table>
+				    </div>
+				</div>
+				
+				<!-- Rotating social icons -->
+				<ul class="social-network social-circle">
+	                        <li><a href="#" class="icoRss social-circle" title="Rss"><i class="fa fa-rss"></i></a></li>
+	                        <li><a href="#" class="icoFacebook social-circle" title="Facebook"><i class="fa fa-facebook"></i></a></li>
+	                        <li><a href="#" class="icoTwitter social-circle" title="Twitter"><i class="fa fa-twitter"></i></a></li>
+	                        <li><a href="#" class="icoGoogle social-circle" title="Google +"><i class="fa fa-google-plus"></i></a></li>
+	                        <li><a href="#" class="icoLinkedin social-circle" title="Linkedin"><i class="fa fa-linkedin"></i></a></li>
+	            </ul>	
+	                
+		    </div>
+        </div>
+        
+        
+        <!-- Other test -->    
+        <div class="col-md-12" data-bind="visible: ($root.currentPage() === 'SIGNUP')"> 
+	        
+					<form role="form" class="col-md-9 go-right">
+						<h2>Sign up (form to right)</h2>
+						
+						<!-- ko with: newPerson -->
+						
+			            <div class="form-group">
+							<input data-bind="value: firstName, valueUpdate: 'afterkeydown'" id="firstname" name="firstname" type="text" class="form-control" required>
+							<label for="firstname">Your First Name</label>
+						</div>
+						<div class="form-group">
+							<input data-bind="value: lastName, valueUpdate: 'afterkeydown'" id="lastname" name="lastname" type="text" class="form-control" required>
+							<label for="lastname">Your Last Name</label>
+						</div>
+						<div class="form-group">
+							<input data-bind="value: age, valueUpdate: 'afterkeydown'" id="age" name="age" class="form-control" required></input>
+							<label for="age">Your Age</label>
+						</div>
+						
+						<button class="btn btn-info" data-bind="click: $root.saveNewPerson" >Sign Up [New Person]</button>
+						
+						<!-- /ko -->
+					</form>
+		</div>
+		
+        
         <!-- boot bck2brwsr -->
         <script type="text/javascript" src="bck2brwsr.js"></script>
         <script>
@@ -76,5 +192,6 @@
             var c = vm.loadClass('de.softcon.BrowserMain');
             c.invoke('main');
         </script>
+        
     </body>
 </html>
