@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/com.nagarro.appbuilder/src-gen" editDirectory="/com.nagarro.appbuilder.edit/src"
+    editorDirectory="/com.nagarro.appbuilder.editor/src" modelPluginID="com.nagarro.appbuilder"
+    forceOverwrite="true" modelName="AppBuilderDSL" updateClasspath="false" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    complianceLevel="6.0" copyrightFields="false" editPluginID="com.nagarro.appbuilder.edit"
+    editorPluginID="com.nagarro.appbuilder.editor" runtimeVersion="2.11">
+  <genPackages prefix="AppBuilderDSL" basePackage="com.nagarro" disposableProviderFactory="true"
+      fileExtensions="appbuilder" ecorePackage="AppBuilderDSL.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="AppBuilderDSL.ecore#//Device">
+      <genEnumLiterals ecoreEnumLiteral="AppBuilderDSL.ecore#//Device/iphone"/>
+      <genEnumLiterals ecoreEnumLiteral="AppBuilderDSL.ecore#//Device/ipad"/>
+      <genEnumLiterals ecoreEnumLiteral="AppBuilderDSL.ecore#//Device/android4"/>
+      <genEnumLiterals ecoreEnumLiteral="AppBuilderDSL.ecore#//Device/android2"/>
+    </genEnums>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//AppBuilder">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//AppBuilder/elements"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//AbstractElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//AbstractElement/name"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//NamespaceDeclation"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//System">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//System/business"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//System/ui"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Business">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Business/elements"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Service"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//InstanceService">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//InstanceService/instanceName"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Ui">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Ui/main"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Ui/services"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Ui/screens"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Main">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Main/appName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Main/appVersion"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Main/devices"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Main/screen"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Main/generalStyle"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Screen">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Screen/name"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//SimpleScreen">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//SimpleScreen/entryParameters"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//SimpleScreen/model"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//SimpleScreen/view"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//SimpleScreen/controller"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//EntryParameters">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//EntryParameters/attributes"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Controller">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Controller/initAction"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Controller/validator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Controller/actions"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//InitAction">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//InitAction/databindings"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//InitAction/uiListenerBindingss"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//InitAction/validationBindings"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//InitAction/instructions"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//ValidationBinding">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//ValidationBinding/condition"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//ValidationBinding/control"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//ValidationBinding/controlAccess"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//UiListenerBinding">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//UiListenerBinding/action"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//UiListenerBinding/control"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//UiListenerBinding/controlAccess"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//DataBinding">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//DataBinding/control"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//DataBinding/controlAccess"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//SimpleDataBinding">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//SimpleDataBinding/model"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//SimpleDataBinding/modelAccess"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//EnumDataBinding">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//EnumDataBinding/enumClassName"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Validator">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Validator/conditions"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Condition">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Condition/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Condition/conditionExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//ConditionExpression"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//SimpleConditionExpression">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//SimpleConditionExpression/variableName"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//CompositeConditionExpression">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//CompositeConditionExpression/conditions"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Action"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//UiAction">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//UiAction/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//UiAction/instructions"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Instruction"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//SetInstruction">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//SetInstruction/model"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//SetInstruction/modelAccess"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//SetInstruction/assignment"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Navigate">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Navigate/screen"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Navigate/params"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//ExecuteAction">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//ExecuteAction/action"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//SetInstructionAssignment"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//RestCall">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//RestCall/url"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//ControlValue">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//ControlValue/control"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//ControlValue/controlAccess"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Model">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Model/attributes"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//View">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//View/layouts"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Layout">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Layout/controls"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Layout/type"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//GridLayout">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//GridLayout/columns"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//RowLayout"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Control"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//ScreenLayout">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//ScreenLayout/screen"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//List">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//List/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//List/labelprovider"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//List/cssStyle"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//List/tooltip"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Value"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//DynamicValue">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//DynamicValue/variableName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//DynamicValue/type"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//DynamicValue/expression"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Expression">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Expression/terms"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Text">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Text/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Text/cssStyle"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Text/resourceKey"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Button">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Button/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Button/cssStyle"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Button/resourceKey"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Label">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Label/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Label/resourceKey"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Attribute">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Attribute/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Attribute/type"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//CompositeScreen">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//CompositeScreen/layouts"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Import">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Import/importedNamespace"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Type">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Type/name"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//DataType"/>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Entity">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Entity/superType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Entity/features"/>
+    </genClasses>
+    <genClasses ecoreClass="AppBuilderDSL.ecore#//Feature">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Feature/many"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AppBuilderDSL.ecore#//Feature/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference AppBuilderDSL.ecore#//Feature/type"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
