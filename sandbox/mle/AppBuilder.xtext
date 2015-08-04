@@ -1,0 +1,306 @@
+grammar com.nagarro.appbuilder.AppBuilder with org.eclipse.xtext.common.Terminals
+
+generate appBuilder "http://www.nagarro.com/appbuilder/AppBuilder"
+
+AppBuilder:
+	(elements += AbstractElement)*;
+
+AbstractElement:
+	PackageDeclaration | NamespaceDeclaration | Type | Import | System;
+
+NamespaceElement:
+	DomainEntity | DomainRepository | Interface | StatelessComponent | StatefulComponent 
+;
+
+NamespaceDeclaration:
+	'namespace' name=QualifiedName
+	'{'
+	(elements += NamespaceElement)*
+	'}';
+
+PackageDeclaration:
+	'package' name=QualifiedName '{'
+	(elements += AbstractElement)*
+	'}';
+
+QualifiedName:
+	ID ('.' ID)*;
+
+Import:
+	'import' importedNamespace=QualifiedNameWithWildcard;
+
+QualifiedNameWithWildcard:
+	QualifiedName '.*'?;
+
+Type:
+	DataType | DomainEntity | Interface;
+
+DataType:
+	'datatype' name=ID;
+
+DomainEntity:
+	'domainentity' name=ID
+	('extends' superType=[DomainEntity|QualifiedName])?
+	'{'
+	(features += Feature)*
+	(references += Reference)*
+	'}';
+
+Reference:
+	'ref' name=ID relationType=RelationType refName=ID ':' type=[Type|QualifiedName];
+
+Feature:
+	name=ID ': ' type=[Type|QualifiedName] ('[]')? 'ordered'?;
+
+Interface:
+	'interface' name=ID
+	'{'
+	(operations += Operation)+
+	'}';
+
+Operation:
+	{Operation} 'operation' (restOperation=RestOperation)? name=ID '(' parameter=ParameterTypeList '):' returnType=ReturnType ('[]')?;
+
+ReturnType:
+	{ReturnType} 'void'|Type|QualifiedName
+;
+
+ParameterTypeList:
+	{ParameterTypeList} (parameters += Parameter)* ;
+
+Parameter:
+	parameter=[Type|QualifiedName] name=ID;
+
+RestOperation:
+	'@rest' '{' url=STRING ', Method.' methodType=MethodType '}';
+
+
+StatelessComponent:
+	{StatelessComponent}
+	'stateless-component' name=ID
+	'{'
+	(requires += Requirement)*
+	(provides += Provider)*
+	'}'
+	;
+	
+StatefulComponent:
+	{StatefulComponent}
+	'stateful-component' name=ID
+	'{'
+	(requires += Requirement)*
+	(provides += Provider)*
+	'}'
+	;	
+	
+DomainRepository:
+	'domain-repository for ' type=[Type|QualifiedName] name=QualifiedName
+	'{'
+	(providers += Provider)*
+	'}';
+
+Requirement:
+	'requires' name=ID ':' repository=[Type|QualifiedName];
+
+Provider:
+	'provides' name=ID ':' repository=[Type|QualifiedName];
+
+System:
+	'system' name=ID
+	'{'
+	business=Business
+	ui=UI
+	'}';
+
+Business:
+	{Business} 'business'
+	'{'
+	(instancesAndConnectors += InstancesAndConnectors)*
+	'}';
+	
+InstancesAndConnectors:
+	InstanceProvider | ConnectorProvider;
+
+InstanceProvider:
+	'instance' name=ID ' : ' domainRepository=DomainRepository;
+	
+ConnectorProvider:
+	'connect' connectorName=ID ' : ' name=QualifiedName
+	'{' 
+		repositoryConnector=RepositoryConnector 
+	'}'
+;
+
+RepositoryConnector:
+	name=ID 'to' instanceProviderName=InstanceProvider ' => ' repositoryProviderName=ID;
+
+UI:
+	'ui'
+	'{'
+	'main(appName:' appName=STRING ', appVersion: ' appVersion=STRING ', devices: [' deviceList+=DeviceList '], entry: '
+	screen=Screen ', generalStyle: ' generalStyle=STRING ')'
+	'instance' name=ID ':' type=[Type|QualifiedName]
+	allScreens=AllScreens 
+	(screens += Screen)*
+	'}';
+
+Screen:
+	{Screen} 'screen' name=ID
+	'{'
+	(screenElements += ScreenElement)*
+	'}';
+
+ScreenElement:
+	EntryParameters | Model | View | Controller | Validator;
+
+	
+AllScreens:
+	'screen'
+	'{'
+		'screens'
+		'{'
+			layout=Layout
+		'}'
+	'}';
+
+UIScreen:
+	'screen' name=ID;
+	
+EntryParameters:
+	'entryparameters'
+	'{'
+	(entryParameters += Feature)+
+	'}';
+
+Model:
+	'model' (name=ID)? '{' (modelType += ModelType)+ '}';
+	
+ModelType:
+	name=ID ': ' type=[Type|QualifiedName] ('[]')? 'ordered'?;
+
+View:
+	'view' (name=ID)? '{' layout=Layout '}';
+
+Controller:
+	 {Controller} 'controller'  (name=ID)? '{' initAction=InitAction (uiactions += UIAction)* '}';
+
+Layout:
+	'layout (type: ' layoutType=STRING ', columns' ' : ' columns=INT ')'
+	'{'
+		(layoutElements += LayoutElement)* 
+	'}'
+	;
+
+LayoutElement:
+	Widget | UIScreen | Layout;
+
+InitAction:
+	'initaction'
+	'{'
+	(actions += ActionType)+
+	'}';
+
+UIAction:
+	'uiaction' name=ID
+	'{'
+	(actions += ActionType)+
+	'}'
+;
+
+Widget:
+	widgetType=WidgetType name=ID '(' parameters+=WidgetParameterList ')';
+
+Parameters:
+	WidgetParameterList | ListAttributeList
+;
+
+WidgetParameterList:
+	{WidgetParameterList} (widgetParameters += WidgetParameter)*;
+
+WidgetParameter:
+	name=ID ':' parameterName=STRING;
+
+ListAttributeList:
+	{ListAttributeList} (listAttributes += ListAttribute)*
+;
+
+ListAttribute:
+	listAttributeType=ListAttributeType ': (' conditionList=ConditionList ')'
+;
+
+Validator:
+	'condition' name=ID '(' (conditionList=ConditionList) ')'
+;
+
+ConditionType:
+	ConditionIdList | ConditionList
+;
+
+ConditionIdList:
+	{ConditionIdList} condition=Condition ('and' otherCondition+=Condition)*
+;
+
+ConditionList:
+{ConditionList} (conditions += Condition)*
+;
+
+Condition:
+	{Condition} name=ID ':' type=[Type|QualifiedName] '|' parameterName=ID '>'|'<'|'==' value=INT
+;
+
+ActionType:
+	SetToAction | BindToAction | AttachToAction | ExecuteAction | NavigateToAction;
+
+SetToAction:
+	'set' parameter=ID 'to' modelType=Model;
+
+BindToAction:
+	'bind' parameter=ID 'to' modelType=Model;
+
+AttachToAction:
+	'attach' parameter=ID 'to' modelType=Model;
+
+ExecuteAction:
+	'execute' executeAction=UIAction;
+
+NavigateToAction:
+	'navigateto' screen=Screen;
+
+DeviceList:
+	{DeviceList} (devices += Device)*;
+
+
+
+
+enum ListAttributeType:
+	labelprovider |
+	cssItem
+;
+
+enum WidgetType:
+	list |
+	tooltip |
+	button |
+	label |
+	text |
+	image |
+	radiobuttongroup;
+
+enum Device:
+	iphone |
+	ipad |
+	android4 |
+	android2;
+
+enum RelationType:
+	one2one |
+	one2many |
+	many2one |
+	many2many;
+
+enum MethodType:
+	GET |
+	POST |
+	PUT;
+
+
