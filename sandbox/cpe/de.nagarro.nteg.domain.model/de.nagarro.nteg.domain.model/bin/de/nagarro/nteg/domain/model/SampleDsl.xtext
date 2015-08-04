@@ -1,0 +1,388 @@
+grammar org.example.domainmodel.Domainmodel with org.eclipse.xtext.common.Terminals
+
+//import "http://www.eclipse.org/xtext/common/JavaVMTypes" as jvmTypes
+
+generate domainmodel "http://www.example.org/domainmodel/Domainmodel"
+
+Domainmodel : 
+	(elements += AbstractElement)*
+;
+
+AbstractElement:
+	NamespaceDeclaration | SystemDefinition
+;
+
+Type:
+	DomainEntity | DataType
+;
+
+QualifiedName :
+	ID ('.' ID)*
+;
+
+Import:
+  'import' importedNamespace = QualifiedNameWithWildcard
+;
+  
+QualifiedNameWithWildcard:
+  QualifiedName '.*'?
+;
+
+DataType: 
+	//'datatype' name = ID 'mappedto' javaType=[jvmTypes::JvmType | QualifiedName] ('config')? ('init' initValue=STRING )? ('persistable')?
+	'datatype' name = ID 'mappedto' mappedType=QualifiedName ('config')? ('init' initValue=STRING )? ('persistable')?
+;
+
+NamespaceDeclaration:
+	'namespace' name = QualifiedName '{'
+		(namespaceElements += AbstractNamespaceElement)*
+	'}'
+;
+
+AbstractNamespaceElement:
+	InterfaceDeclaration | StatelessComponent | DomainRepository | DomainEntity | DataType | Import
+;
+
+/* Domain entity */
+FeatureMappingOptions:
+	('one2one' | 'one2many' | 'many2one' | 'many2many')
+;
+
+Feature:
+  ('ref')? name = ID (mappingOption = FeatureMappingOptions mapName=ID)? ':' type = [Type | QualifiedName]
+;
+
+DomainEntity:
+	'domainentity' name = ID '{'
+		(features += Feature)*
+	'}'
+;
+
+/* Interface */
+
+RestMethodCall:
+	('GET' | 'POST' | 'PUT')
+;
+
+RestOperation:
+	'@rest{' STRING ', ' 'Method.' RestMethodCall '}'
+;
+
+MethodParameter:
+	( type = [Type | QualifiedName] ) (name = ID)
+;
+
+MethodParameters:
+	parameters += MethodParameter (', ' parameters += MethodParameter)*
+;
+
+MethodCall:
+	name = ID '(' (parameters = MethodParameters)? ')'
+;
+
+InterfaceOperation:
+	'operation' (restOperation = RestOperation)? methodCall = MethodCall ':' type = [Type | QualifiedName] ('[]')?
+;
+
+InterfaceDeclaration :
+	'interface' name = ID '{'
+		(operations += InterfaceOperation)*
+	'}'
+;
+
+/* Stateless component */
+
+InterfaceOperationUsageRule:
+	('provides' | 'requires') name = ID ':' interfaceName = [InterfaceDeclaration | QualifiedName]
+;
+
+InterfaceOperationsUsageRule:
+	usageOperations += InterfaceOperationUsageRule (usageOperations += InterfaceOperationUsageRule)*
+;
+
+StatelessComponent:
+	'stateless-component' name = ID '{'
+		(operations = InterfaceOperationsUsageRule)?
+	'}'
+;
+
+/* Domain repository */
+
+DomainRepository:
+	'domainrepository' 'for' entityType = [DomainEntity | QualifiedName] name = ID '{'
+		(operations = InterfaceOperationsUsageRule)?
+	'}'
+;
+
+/* System definition */
+
+/* -> Entry parameters */
+EntryParametersModule:
+	'entryParameters'
+	'{'
+		entryFeatures += ModelFeature (entryFeatures += ModelFeature)*
+	'}'
+;
+
+/* -> Model */
+ModelFeature:
+	name = ID ':' type = [Type | QualifiedName] ('[]' ('ordered')?)? 
+;
+
+ModelModule:
+	'model'
+	'{'
+		modelFeatures += ModelFeature (modelFeatures += ModelFeature)*
+	'}'
+;
+
+/* -> View */
+
+enum ContentElementLiteral:
+	TEXT='text' | BUTTON='button' | LABEL='label' | LIST='list' | IMAGE='image'
+;
+
+enum PropertyNameLiteral:
+	LABEL_PROVIDER='labelProvider' | CSS_ITEM='cssItem' | TOOLTIP='tooltip' | RESOURCE_KEY='resourceKey' | STYLE='style' | PATH='path' | TYPE='type' | COLUMNS='columns'
+;
+
+ElementFeature:
+	propertyName=PropertyNameLiteral ':' propertyValue=STRING
+;
+
+ContentElement:
+	contentElement = ContentElementLiteral name = ID '(' (features += ElementFeature (', ' features += ElementFeature)*)? ')' 
+;
+
+enum ContainerElementLiteral:
+		LAYOUT='layout' | SCREEN='screen'
+;
+
+ContainerElement:
+	container = ContainerElementLiteral (name = ID)? ('(' features += ElementFeature (', ' features += ElementFeature)* ')')? 
+	('{' 
+		elements += ViewElement (elements+= ViewElement)*
+	'}')?
+;
+
+ViewElement:
+	 ContainerElement | ContentElement
+;
+
+ViewModule:
+	'view'
+	'{'
+		elements += ViewElement 
+		//name=ID
+	'}'
+;
+
+
+/* -> Controller */
+
+/* -> Controller.InitAction */
+
+ValidateAction:
+	'validate' condition = [ValidatorFeature] 'on' uiReceiver = SetUIElementReceiver
+;
+
+AttachAction:
+	'attach' uiAction = [UIActionModule] 'to' uiReceiver = SetUIElementReceiver
+;
+
+BindEnumSource:
+	'enumDataSource' '(' 'className' ':' enumType=STRING ')'
+;
+
+BindSource:
+	modelFeatureName=[ModelFeature] | BindEnumSource
+;
+
+BindAction:
+	'bind' bindSource=BindSource ('.' attribute = ID)? 'to' uiReceiver = SetUIElementReceiver
+;
+
+InitActionFeature:
+	SetAction | AttachAction | ValidateAction | BindAction
+;
+
+InitActionModule:
+	'initaction'
+	'{'
+		initActionFeatures += InitActionFeature (initActionFeatures += InitActionFeature)*
+	'}'	
+;
+
+/* -> Controller.Validator */
+ValidatorRule:
+	stringRule = STRING | conditionName = [ValidatorFeature]
+;
+
+ValidatorRules:
+	validatorRules += ValidatorRule ('and' validatorRules += ValidatorRule)*
+;
+
+ValidatorFeature:
+	'condition' name=ID '(' validatorRules = ValidatorRules ')'
+;
+
+ValidatorModule:
+	'validator'
+	'{'
+		validatorFeatures += ValidatorFeature (validatorFeatures += ValidatorFeature)*
+	'}'	
+;
+
+/* -> Controller.UIAction */
+ScreenModelParameter:
+	 modelFeatureName=[ModelFeature|QualifiedName] ':' modelFeatureValue=STRING 
+;
+
+ScreenModelParameters:
+	parameters += ScreenModelParameter (', ' parameters += ScreenModelParameter)*
+;
+
+NavigateToAction:
+	'navigateto' screenElementId=[ScreenFeature] ('(' modelFeatures = ScreenModelParameters ')')?
+;
+
+ExecuteAction:
+	'execute' uiActionName = [UIActionModule]	
+;
+
+SetRestCallReceiverURLParameter:
+	'url' ':' parameterType=STRING
+;
+
+SetRestCallReceiverReturnTypeParameter:
+	'returnType' ':' parameterType = [Type | QualifiedName]
+;
+
+SetRestCallReceiverIDParameter:
+	('id' | 'update') ':' parameterType=ID 
+;
+
+SetRestCallReceiverParameter:
+	SetRestCallReceiverURLParameter | SetRestCallReceiverReturnTypeParameter | SetRestCallReceiverIDParameter
+;
+
+SetRestCallReceiverParameters:
+	parameters += SetRestCallReceiverParameter (', ' parameters += SetRestCallReceiverParameter)*
+;
+
+SetRestCallReceiver:
+	'restcall' '(' parameters +=SetRestCallReceiverParameters ')'
+;
+
+enum UIElementReceiverKey:
+	SELECTION='selection'| VALUES_='values'| ON_SELECTION='onSelection'| TEXT='text'
+;
+
+SetUIElementReceiver:
+	widgetName=[ViewElement] '.' uiKey=UIElementReceiverKey
+;
+
+SetActionReceiver:
+	SetRestCallReceiver | SetUIElementReceiver
+;
+
+SetAction:
+	'set' modelFeatureName=[ModelFeature] 'to' setActionReceiver = SetActionReceiver 
+;
+
+InterfaceMethodCallParameter:
+	parameterName = [MethodParameter | QualifiedName] ':' parameterType = (ID|STRING)
+;
+
+InterfaceMethodCallParameters:
+	parameters += InterfaceMethodCallParameter (', ' parameters += InterfaceMethodCallParameter)*
+;
+
+InterfaceMethodCall:
+	interfaceInstanceName = [BusinessFeature] '.' methodName = [MethodCall | QualifiedName] '(' parameters += InterfaceMethodCallParameters ')'
+;
+
+UIActionFeature:
+	NavigateToAction | ExecuteAction | SetAction | InterfaceMethodCall
+;
+
+UIActionModule:
+	'uiaction' name=ID
+	'{'
+		uiActionFeatures += UIActionFeature (uiActionFeatures += UIActionFeature)*
+	'}'
+;
+
+ControllerElement:
+	UIActionModule | InitActionModule |  ValidatorModule
+;
+
+ControllerModule:
+	'controller'
+	'{'
+		elements += ControllerElement (elements += ControllerElement)*
+	'}'
+;
+
+ScreenModule:
+	EntryParametersModule | ModelModule | ViewModule | ControllerModule
+;
+
+ScreenFeature:
+	'screen' name=ID
+	'{'
+		screenModules += ScreenModule (screenModules += ScreenModule)*
+	'}'
+;
+
+
+MainFeatureOption:
+	('appName' | 'appVersion' | 'entryScreen' | 'devices' | 'style') ':' name=STRING
+;
+
+MainFeature:
+	'main' '('
+		features += MainFeatureOption (', ' features += MainFeatureOption)*
+	')'
+;
+
+UIFeature:
+	MainFeature | ScreenFeature
+;
+
+UIModule:
+	'uiSystem' 
+	'{'
+		uiFeatures += UIFeature (uiFeatures += UIFeature)*
+	'}'
+;
+
+BusinessFeatureType:
+	InterfaceDeclaration | DomainRepository | StatelessComponent
+;
+
+BusinessFeature:
+	'instance' name=ID ':' type=[BusinessFeatureType | QualifiedName]
+	('{' connectPoint1=ID 'to' connectPoint2=[BusinessFeature] '=>' connectEnd=ID '}')?
+;
+
+BusinessFeatures:
+	features += BusinessFeature (features += BusinessFeature)*
+;
+
+BusinessModule:
+	'businessSystem' 
+	'{'
+		BusinessFeatures
+	'}' 
+;
+
+SystemModule:
+	BusinessModule | UIModule 
+;
+
+SystemDefinition:
+	'system' name = ID '{'
+		modules += SystemModule (modules += SystemModule)*
+	'}'
+;

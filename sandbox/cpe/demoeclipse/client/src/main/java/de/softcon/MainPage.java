@@ -4,6 +4,7 @@ package de.softcon;
 import net.java.html.json.ComputedProperty;
 import net.java.html.json.Function;
 import net.java.html.json.Model;
+import net.java.html.json.OnPropertyChange;
 import net.java.html.json.Property;
 import de.softcon.business.PageType;
 
@@ -92,4 +93,13 @@ public class MainPage
             }
         }
     }
+    
+    /*@OnPropertyChange({"age"})
+    static void validateAge()
+    {
+        if (myModel.getSelectedPerson().getAge() > 15) 
+        {
+            System.out.println("age in the model:" + myModel.getSelectedPerson().getAge());
+        }
+    }*/
 }
