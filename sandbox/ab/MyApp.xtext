@@ -1,0 +1,466 @@
+grammar com.nagarro.MyApp with org.eclipse.xtext.common.Terminals
+
+generate myApp "http://www.nagarro.com/MyApp"
+
+AppBuilder:
+	(elements += AbstractElement)*; 
+
+AbstractElement:
+	PackageDeclaration | Type | Import;
+
+
+PackageDeclaration:
+	'package' name=QualifiedName ;
+
+QualifiedName:
+	ID ('.' ID)*;
+
+Import:
+	'import' importedNamespace=QualifiedNameWithWildcard;
+
+QualifiedNameWithWildcard:
+	QualifiedName '.*'?;
+
+Type:
+	DataType | DomainEntity | Interface | Component | Instance | NewScreen | NewValidator | NewSystem;
+
+//datatype bool mappedto java.lang.Boolean config init “null” persistable
+
+DataType:
+	'NewDatatype' name=ID ('mappedTo' QualifiedName)? ('config init' initName=STRING)? ('persistable')?;
+    
+DomainEntity:
+	'NewDomainentity' name=ID
+	('extends' superType=[DomainEntity|QualifiedName])?
+	'{'
+	(fields += Fields)+
+	(operations += Operations)*
+	(references += Reference)*
+	'}';
+
+
+Fields:
+	'field' name=ID ':' type=[DataType];
+
+// operation calcTax(string s, int a):int
+Operations:
+	//'operation' (restAnnotation)? methodName=ID '(' type=[Type] name=ID (','type=[Type] name=ID)* '):' returnType=[Type]
+	'operation' restAnnotation=(restAnnotation)? methodName=ID '(' (args += args (',')*)* '):' returnType=ID
+;
+
+args:
+type=ID name=ID
+;
+
+Reference:
+	'ref' relationType=RelationType name=[DomainEntity];
+	
+//operation store(Person person) : void	
+Interface:
+	'interface' name=ID 
+	'{'
+	 (operations += Operations)*
+	'}'
+;
+
+//@rest{“/persons”, Method.GET}
+restAnnotation:
+	'@rest{'
+	url=STRING',Method.'method=MethodType
+	'}'
+;
+
+Component:
+	'NewComponent' name=ID 'componentType' method=ComponentType
+	'{'
+	 (fields += Fields)*
+	 ('uses' useInterfaceInstanceName += InterfaceInstance)*
+	 ('provides' provideInterfaceInstanceName += InterfaceInstance)*	
+	'}'
+;
+
+InterfaceInstance:
+name=ID ':' interfaceName=[Interface]
+;
+
+enum ComponentType:
+	STATEFUL |
+	STATELESS |
+	DOMAIN_REPOSITORY_FOR
+;
+
+Instance:
+	'instance' instanceName=ID ':' type=[Component]
+	('connect' connector=Connector)?
+;
+
+
+Connector:
+	name=ID 'to' targetInstanceName=ID '=>' targetInterfaceInstanceName=ID;
+	
+// UI code
+
+NewScreen:
+	'screen' screenName=ID
+	 '{'
+	   (entryParams += EntryParams)*
+	   (layout += Newlayout)*
+	   (model += NewModel)*
+	   (controller += NewController)*
+	 '}'
+;
+
+
+
+//EntryParameters:
+//	'entryParameters{'name=ID ':' type=[DataType] (',' name=ID ':' type=[DataType])* '}'
+//;
+
+EntryParams:
+	'entryParams {' (fields += Fields (',')* )* '}'
+;
+
+Newlayout:
+	 'layoutNew(type:' layoutType=NewLayoutType ', numberOfPartition:' rowOrColumnCount=INT ')'
+	 '{'
+	  (layoutElements += NewLayoutElement)*
+	 '}'
+;	
+
+NewLayoutElement:
+	 Newlayout | NewWidget;
+
+NewWidget:
+	'widget' type=NewWidgetType 'id:' name=ID 'value:' value=STRING ('properties' WidgetProperty +=WidgetProperty)*
+;
+
+enum NewWidgetType:
+	label | text | button | grid | list
+;
+
+enum WidgetProperyType:
+	 text | enable | disable | submit
+;
+	
+WidgetProperty:
+	widgetType=	WidgetProperyType (',' type+=WidgetProperyType)*
+;	
+
+// specify whether the layout elements will be placed horizontally or vertically (within 1 column).
+enum NewLayoutType:
+	ROW |
+	COLUMN
+;
+
+NewModel:
+	'NewModel'
+	'{'
+	  instanceName=ID ':' type=[DomainEntity]
+	'}'
+	
+;
+
+NewController:
+	'NewController' name=ID
+	'{'
+	initAction +=InitAction (uiActions += UIAction)*
+	'}'	
+;
+
+InitAction:
+	'initaction'
+	'{'
+	(actions += NewActionType)+
+	'}';
+
+UIAction:
+	'uiaction' name=ID
+	'{'
+	(actions += NewActionType)+
+	'}'
+;
+
+NewActionType:
+	SetToAction | BindToAction | AttachToAction | ExecuteAction | NavigateToAction | ValidateAction | ExecuteOperation;
+
+SetToAction:
+	'set' modelType=[NewModel] 'to' UIElement=ID;
+
+BindToAction:
+	'bind' ModelField=ID 'to' UIElement=ID;
+
+AttachToAction:
+	'attach' actionName=ID 'to' UIElement=ID;
+
+ExecuteAction:
+	'execute Action' executeAction=UIAction;
+
+NavigateToAction:
+	'navigateto' screen=[NewScreen];
+
+ValidateAction:
+	'validate' newValidator = [NewValidator] 'on' UIElement=ID ;
+
+ExecuteOperation:
+	'execute Operation' interfaceName=[Interface]
+;
+
+NewValidator:
+	'validate' name=ID 
+	'{'
+	 'condition' parameterName=ID 'type' parameterValue=[Type] 'minLength' value=INT 
+	'}'
+;
+
+// system rule
+NewSystem:
+	'system'
+	'{'
+	'main(appName:' appName=STRING ', appVersion: ' appVersion=STRING ', devices:' deviceList=Device (','device+=Device)*
+	', EntryScreen: ' screen=[NewScreen] ', style: ' style=STRING ')'
+	'}'
+;
+//***************************************************************************
+
+//Feature:
+//	name=ID ': ' type=[Type|QualifiedName] ('[]')? 'ordered'?;
+
+//Interface:
+//	'interface' name=ID
+//	'{'
+//	(operations += Operation)+
+//	'}';
+
+Operation:
+	{Operation} 'operation' (restOperation=RestOperation)? name=ID '(' parameter=ParameterTypeList '):' returnType=ReturnType ('[]')?;
+
+ReturnType:
+	{ReturnType} 'void'|Type|QualifiedName
+;
+
+ParameterTypeList:
+	{ParameterTypeList} (parameters += Parameter)* ;
+
+Parameter:
+	parameter=[Type|QualifiedName] name=ID;
+
+RestOperation:
+	'@rest' '{' url=STRING ', Method.' methodType=MethodType '}';
+
+
+StatelessComponent:
+	{StatelessComponent}
+	'stateless-component' name=ID
+	'{'
+	(requires += Requirement)*
+	(provides += Provider)*
+	'}'
+	;
+	
+StatefulComponent:
+	{StatefulComponent}
+	'stateful-component' name=ID
+	'{'
+	(requires += Requirement)*
+	(provides += Provider)*
+	'}'
+	;	
+	
+DomainRepository:
+	'domain-repository for ' type=[Type|QualifiedName] name=QualifiedName
+	'{'
+	(providers += Provider)*
+	'}';
+
+Requirement:
+	'requires' name=ID ':' repository=[Type|QualifiedName];
+
+Provider:
+	'provides' name=ID ':' repository=[Type|QualifiedName];
+
+System:
+	'system' name=ID
+	'{'
+	business=Business
+	ui=UI
+	'}';
+
+Business:
+	{Business} 'business'
+	'{'
+	(instancesAndConnectors += InstancesAndConnectors)*
+	'}';
+	
+InstancesAndConnectors:
+	InstanceProvider | ConnectorProvider;
+
+InstanceProvider:
+	'instance' name=ID ' : ' domainRepository=DomainRepository;
+	
+ConnectorProvider:
+	'connect' connectorName=ID ' : ' name=QualifiedName
+	'{' 
+		repositoryConnector=RepositoryConnector 
+	'}'
+;
+
+RepositoryConnector:
+	name=ID 'to' instanceProviderName=InstanceProvider ' => ' repositoryProviderName=ID;
+
+UI:
+	'ui'
+	'{'
+	'main(appName:' appName=STRING ', appVersion: ' appVersion=STRING ', devices: [' deviceList+=DeviceList '], entry: '
+	screen=Screen ', generalStyle: ' generalStyle=STRING ')'
+	'instance' name=ID ':' type=[Type|QualifiedName]
+	allScreens=AllScreens 
+	(screens += Screen)*
+	'}';
+
+Screen:
+	{Screen} 'screen' name=ID
+	'{'
+	(screenElements += ScreenElement)*
+	'}';
+
+ScreenElement:
+	Model | View | Controller | Validator;
+//EntryParameters | Model | View | Controller | Validator;
+
+	
+AllScreens:
+	'screen'
+	'{'
+		'screens'
+		'{'
+			layout=Layout
+		'}'
+	'}';
+
+UIScreen:
+	'screen' name=ID;
+	
+//EntryParameters:
+//	'entryparameters'
+//	'{'
+//	(entryParameters += Feature)+
+//	'}';
+
+Model:
+	'model' (name=ID)? 
+	'{'
+	 (modelType += ModelType)+ 
+	'}';
+	
+ModelType:
+	name=ID ': ' type=[Type|QualifiedName] ('[]')? 'ordered'?;
+
+View:
+	'view' (name=ID)? '{' layout=Layout '}';
+
+Controller:
+	 {Controller} 'controller'  (name=ID)? '{' initAction=InitAction (uiactions += UIAction)* '}';
+
+Layout:
+	'layout (type: ' layoutType=STRING ', columns' ' : ' columns=INT ')'
+	'{'
+		(layoutElements += LayoutElement)* 
+	'}'
+	;
+
+LayoutElement:
+	Widget | UIScreen | Layout;
+
+
+
+Widget:
+	widgetType=WidgetType name=ID '(' parameters+=WidgetParameterList ')';
+
+Parameters:
+	WidgetParameterList | ListAttributeList
+;
+
+WidgetParameterList:
+	{WidgetParameterList} (widgetParameters += WidgetParameter)*;
+
+WidgetParameter:
+	name=ID ':' parameterName=STRING;
+
+ListAttributeList:
+	{ListAttributeList} (listAttributes += ListAttribute)*
+;
+
+ListAttribute:
+	listAttributeType=ListAttributeType ': (' conditionList=ConditionList ')'
+;
+
+Validator:
+	'condition' name=ID '(' (conditionList=ConditionList) ')'
+;
+
+ConditionType:
+	ConditionIdList | ConditionList
+;
+
+ConditionIdList:
+	{ConditionIdList} condition=Condition ('and' otherCondition+=Condition)*
+;
+
+ConditionList:
+{ConditionList} (conditions += Condition)*
+;
+
+Condition:
+	{Condition} name=ID ':' type=[Type|QualifiedName] '|' parameterName=ID '>'|'<'|'==' value=INT
+;
+
+//ActionType:
+//	SetToAction | BindToAction | AttachToAction | ExecuteAction | NavigateToAction;
+//
+//SetToAction:
+//	'set' parameter=ID 'to' modelType=Model;
+//
+//BindToAction:
+//	'bind' parameter=ID 'to' modelType=Model;
+//
+//AttachToAction:
+//	'attach' parameter=ID 'to' modelType=Model;
+//
+//ExecuteAction:
+//	'execute' executeAction=UIAction;
+//
+//NavigateToAction:
+//	'navigateto' screen=Screen;
+
+DeviceList:
+	{DeviceList} (devices += Device)*;
+
+
+enum ListAttributeType:
+	labelprovider |
+	cssItem
+;
+
+enum WidgetType:
+	list |
+	tooltip |
+	button |
+	label |
+	text |
+	image |
+	radiobuttongroup;
+
+enum Device:
+	iphone6S|
+	samsung_Galaxy;
+
+enum RelationType:
+	one2one |
+	one2many |
+	many2one |
+	many2many;
+
+enum MethodType:
+	GET |
+	POST |
+	PUT;
